@@ -1,0 +1,9 @@
+[project]
+name = "dank-translate-ai-runtime"
+version = "1.0.0"
+description = "Runtime for the Dank Translate AI DMS plugin"
+requires-python = ">=3.11"
+dependencies = []
+
+[tool.uv]
+package = false

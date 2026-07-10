@@ -1,0 +1,32 @@
+{
+  "$schema": "https://danklinux.com/schemas/plugin.json",
+  "id": "dankTranslateAI",
+  "name": "Dank Translate AI",
+  "description": "Security-focused one-shot translation for selections and recent copies, with custom OpenAI-compatible models, streaming, and DankBar history",
+  "version": "1.0.0",
+  "author": "Ordis",
+  "type": "composite",
+  "capabilities": [
+    "daemon",
+    "dankbar-widget",
+    "translation",
+    "translation-history"
+  ],
+  "icon": "translate",
+  "components": {
+    "daemon": "./TranslateDaemon.qml",
+    "widget": "./TranslateBarWidget.qml"
+  },
+  "settings": "./TranslateSettings.qml",
+  "requires_dms": ">=1.5.0",
+  "dependencies": [
+    "uv",
+    "wl-clipboard"
+  ],
+  "permissions": [
+    "settings_read",
+    "settings_write",
+    "process",
+    "network"
+  ]
+}
