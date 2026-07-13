@@ -3,7 +3,7 @@
   "id": "dankTranslateAI",
   "name": "Dank Translate AI",
   "description": "Security-focused one-shot translation for selections and recent copies, with custom OpenAI-compatible models, streaming, and DankBar history",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": "Ordis",
   "type": "composite",
   "capabilities": [

@@ -20,6 +20,7 @@ PluginComponent {
     readonly property int selfCopyMatchMs: 3000
 
     property bool initialized: false
+    property bool ipcStopping: false
     property bool popupVisible: false
     property var popupScreen: Quickshell.screens.length > 0 ? Quickshell.screens[0] : null
     property var activeCapture: null
@@ -104,7 +105,44 @@ PluginComponent {
         trimHistory();
     }
 
-    Component.onCompleted: Qt.callLater(initialize)
+    function activateIpc() {
+        if (ipcStopping || pluginId !== "dankTranslateAI")
+            return;
+
+        ipc.target = pluginId;
+        ipc.enabled = true;
+    }
+
+    function deactivateIpc() {
+        if (ipcStopping)
+            return;
+
+        ipcStopping = true;
+
+        // Deregister synchronously before clearing the target.
+        ipc.enabled = false;
+        ipc.target = "";
+
+        inputDebounceTimer.stop();
+        ++inputRequestSerial;
+        cancelActive(false);
+
+        if (activeCapture) {
+            activeCapture.signal(15);
+            activeCapture = null;
+        }
+    }
+
+    Component.onCompleted: {
+        Qt.callLater(initialize);
+        Qt.callLater(activateIpc);
+    }
+    Component.onDestruction: deactivateIpc()
+    onPluginIdChanged: {
+        Qt.callLater(initialize);
+        if (pluginId === "dankTranslateAI")
+            Qt.callLater(activateIpc);
+    }
     onPluginServiceChanged: Qt.callLater(initialize)
 
     Connections {
@@ -114,6 +152,11 @@ PluginComponent {
         function onPluginDataChanged(changedPluginId) {
             if (changedPluginId === root.pluginId)
                 root.trimHistory();
+        }
+
+        function onPluginUnloaded(changedPluginId) {
+            if (changedPluginId === root.pluginId)
+                root.deactivateIpc();
         }
     }
 
@@ -661,7 +704,9 @@ PluginComponent {
     }
 
     IpcHandler {
-        target: "dankTranslateAI"
+        id: ipc
+        target: ""
+        enabled: false
 
         function translateSelection(): string {
             root.beginSelectionTranslation();
